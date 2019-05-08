@@ -40,12 +40,12 @@ class MGPR(gpflow.Parameterized):
             self.models[i].X = X
             self.models[i].Y = Y[:, i:i+1]
 
-    def optimize(self, restarts=1):
+    def optimize(self, maxiter=100, restarts=1, disp=False):
         if len(self.optimizers) == 0:  # This is the first call to optimize();
             for model in self.models:
                 # Create an gpflow.train.ScipyOptimizer object for every model embedded in mgpr
                 optimizer = gpflow.train.ScipyOptimizer(method='L-BFGS-B')
-                optimizer.minimize(model)
+                optimizer.minimize(model, maxiter=maxiter, disp=disp)
                 self.optimizers.append(optimizer)
                 restarts -= 1
 
@@ -57,7 +57,7 @@ class MGPR(gpflow.Parameterized):
                 randomize(model)
                 optimizer._optimizer.minimize(session=session,
                             feed_dict=optimizer._gen_feed_dict(optimizer._model, None),
-                            step_callback=None)
+                            step_callback=None, maxiter=maxiter, disp=disp)
                 likelihood = model.compute_log_likelihood()
                 if likelihood > best_likelihood:
                     best_parameters = model.read_values(session=session)

@@ -50,11 +50,11 @@ class PILCO(gpflow.models.Model):
         reward = self.predict(self.m_init, self.S_init, self.horizon)[2]
         return reward
 
-    def optimize_models(self, maxiter=200, restarts=1):
+    def optimize_models(self, maxiter=200, restarts=1, disp=False):
         '''
         Optimize GP models
         '''
-        self.mgpr.optimize(restarts=restarts)
+        self.mgpr.optimize(maxiter=maxiter, restarts=restarts, disp=disp)
         # Print the resulting model parameters
         # ToDo: only do this if verbosity is large enough
         lengthscales = {}; variances = {}; noises = {};
